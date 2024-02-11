@@ -1,31 +1,28 @@
-import Sequelize from 'sequelize';
+import { Sequelize } from 'sequelize';
+import dotenv from 'dotenv';
 
+dotenv.config();
 
-if (
-  !process.env.DB_NAME ||
-  !process.env.DB_USERNAME ||
-  !process.env.DB_PASSWORD ||
-  !process.env.DB_HOST ||
-  !process.env.DB_PORT
-) {
-  console.log('Please set MySQL ENV variables');
-  process.exit(-1);
+const db = new Sequelize({
+  dialect: 'mysql', 
+  host: process.env.DB_HOST,
+  port: process.env.DB_PORT, 
+  username: process.env.DB_USERNAME,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
+});
+
+// Test the connection
+async function testConnection() {
+  try {
+    await db.authenticate();
+    console.log('Connection has been established successfully.');
+  } catch (error) {
+    console.error('Unable to connect to the database:', error);
+  }
 }
 
-const db = {};
+// Call the function to test the connection
+testConnection();
 
-const sequelize = new Sequelize(
-  process.env.DB_NAME,
-  process.env.DB_USERNAME,
-  process.env.DB_PASSWORD,
-  process.env.DB_DIALECT,
-  {
-    host: process.env.DB_HOST,
-    port: process.env.DB_PORT,
-  }
-);
-
-db.sequelize = sequelize;
-db.Sequelize = Sequelize;
-
-export default db;
+export default db 
