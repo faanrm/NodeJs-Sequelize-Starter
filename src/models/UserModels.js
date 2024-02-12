@@ -1,5 +1,6 @@
 import { DataTypes } from 'sequelize';
 import db from '../config/sql.js';
+import Profiles from './ProfilesModels.js';
 
 const User = db.define('users', {
   user_id: {
@@ -12,7 +13,7 @@ const User = db.define('users', {
     type: DataTypes.INTEGER(11),
     allowNull: false,
     references: {
-      model: 'profiles',
+      model: Profiles,
       key: 'profile_id'
     }
   },

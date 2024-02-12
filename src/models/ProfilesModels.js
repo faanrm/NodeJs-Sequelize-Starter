@@ -1,6 +1,6 @@
-import { Sequelize, DataTypes } from 'sequelize';
-
-const Profiles = Sequelize.define('profiles', {
+import {  DataTypes } from 'sequelize';
+import db from '../config/sql.js';
+const Profiles = db.define('profiles', {
     profile_id: {
         type: DataTypes.INTEGER(11),
         allowNull: false,
