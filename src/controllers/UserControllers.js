@@ -41,3 +41,19 @@ export const deleteUser = async (req, res) => {
         res.status(500).json({message : error.message})
     }
 }
+export const updateUser = async (req, res) => {
+    const { id } = req.params;
+    try {
+      const [updated] = await User.update(req.body, {
+        where: { user_id: id }
+      });
+      if (updated) {
+        const updatedUser = await User.findByPk(id);
+        res.status(200).json(updatedUser);
+      } else {
+        res.status(404).json({ message: 'Utilisateur non trouvé' });
+      }
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  };
