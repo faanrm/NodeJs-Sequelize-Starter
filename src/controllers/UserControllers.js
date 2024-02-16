@@ -1,5 +1,6 @@
 import User from "../models/UserModels.js";
-
+import jwt from "jsonwebtoken"
+import bcrypt from "bcrypt"
 export const getAllUser = async (req, res) => {
     try {
         const user = User.findAll()
@@ -15,15 +16,33 @@ export const getAllUser = async (req, res) => {
     }
 }
 export const createUser = async (req, res) => {
-    try {
-        const { name } = req.body
-        if (!name) {
-            console.log("name is required");
-        }
-        return res.status(201).json({ message: "User created!", data: newUser })
-    } catch (error) {
-        res.status(400).json({ message: error.message })
+  const { name, email, password, confirmPassword } = req.body;
+
+  try {
+    // Check if passwords match
+    if (password !== confirmPassword) {
+      return res.status(400).json({ message: 'Passwords do not match' });
     }
+    // Check if user with the provided email already exists
+    const existingUser = await User.findOne({ where: { email } });
+    if (existingUser) {
+      return res.status(400).json({ message: 'User with this email already exists' });
+    }
+    // Hash the password
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Create the user
+    const newUser = await User.create({ name, email, password: hashedPassword });
+
+    // User created successfully, generate token
+    const token = jwt.sign({ userId: newUser.user_id }, 'your_secret_key_here', { expiresIn: '1h' });
+
+    // Send token in response
+    res.status(201).json({ token });
+  } catch (error) {
+    console.error('Error creating user:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
 }
 
 export const deleteUser = async (req, res) => {
